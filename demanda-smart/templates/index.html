@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema Energia{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">⚡ Dashboard de Energia</h2>
+            <small class="text-muted">Monitoramento inteligente de consumo, simulação e equipamentos</small>
+        </div>
+
+        <div>
+            <button class="btn btn-primary btn-sm">🔄 Atualizar dados</button>
+        </div>
+    </div>
+
+    <!-- KPIs PRINCIPAIS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card p-3 border-start border-primary border-4">
+                <small class="text-muted">Consumo Total</small>
+                <h4 class="fw-bold mb-0">1.240 kWh</h4>
+                <small class="text-success">↑ 4.2% este mês</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 border-start border-danger border-4">
+                <small class="text-muted">Custo Estimado</small>
+                <h4 class="fw-bold mb-0">R$ 3.890</h4>
+                <small class="text-danger">↑ 2.1% este mês</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 border-start border-success border-4">
+                <small class="text-muted">Eficiência Energética</small>
+                <h4 class="fw-bold mb-0">87%</h4>
+                <small class="text-success">↑ melhoria contínua</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 border-start border-warning border-4">
+                <small class="text-muted">Equipamentos Ativos</small>
+                <h4 class="fw-bold mb-0">18</h4>
+                <small class="text-muted">3 em manutenção</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold">📊 Simulação</h6>
+                <p class="text-muted small">Simule consumo e custo de energia em tempo real.</p>
+                <a href="/simulacao" class="btn btn-outline-primary btn-sm">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold">⚙️ Equipamentos</h6>
+                <p class="text-muted small">Gerencie equipamentos e consumo individual.</p>
+                <a href="/equipamentos" class="btn btn-outline-primary btn-sm">Acessar</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold">📈 Consumo</h6>
+                <p class="text-muted small">Visualize histórico detalhado de consumo.</p>
+                <a href="/consumo" class="btn btn-outline-primary btn-sm">Acessar</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="row g-3">
+
+        <!-- GRÁFICO 1 -->
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h6 class="fw-bold mb-3">📈 Consumo ao longo do tempo</h6>
+
+                <canvas id="graficoConsumo"></canvas>
+
+            </div>
+        </div>
+
+        <!-- STATUS LATERAL -->
+        <div class="col-md-4">
+            <div class="card p-4 h-100">
+
+                <h6 class="fw-bold mb-3">📌 Status do Sistema</h6>
+
+                <div class="mb-3">
+                    <small class="text-muted">Rede elétrica</small>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Eficiência geral</small>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width: 78%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Carga ativa</small>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <small class="text-muted">Última atualização:</small><br>
+                <strong>Agora</strong>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('graficoConsumo');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+            label: 'Consumo (kWh)',
+            data: [120, 190, 150, 220, 180, 240],
+            borderWidth: 3,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        }
+    }
+});
+</script>
+
+{% endblock %}

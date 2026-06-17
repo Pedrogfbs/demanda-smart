@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Relatórios - Demand Smart</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: #f5f7fa;
+}
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #0d1b2a;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar h4 {
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.sidebar a:hover {
+    background: #1b263b;
+    color: #fff;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.card-box {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.1);
+}
+
+.valor {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<h4>⚡ Demand Smart</h4>
+
+<a href="/">🏠 Dashboard</a>
+<a href="/pivos">💧 Pivôs</a>
+<a href="/manutencao">🔧 Manutenção</a>
+<a href="/relatorios">📊 Relatórios</a>
+<a href="/financeiro">💰 Financeiro</a>
+
+</div>
+
+<!-- CONTEÚDO -->
+<div class="content">
+
+<h2>📊 Relatórios do Sistema</h2>
+
+<p>Resumo geral de operação, consumo e desempenho dos pivôs.</p>
+
+<!-- CARDS RESUMO -->
+<div class="row mt-4">
+
+<div class="col-md-3">
+<div class="card card-box p-3">
+<h6>Total de Pivôs</h6>
+<div class="valor" id="totalPivos">0</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card card-box p-3">
+<h6>Pivôs Ativos</h6>
+<div class="valor text-success" id="ativos">0</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card card-box p-3">
+<h6>Consumo Total</h6>
+<div class="valor" id="consumo">0 kWh</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card card-box p-3">
+<h6>Custo Estimado</h6>
+<div class="valor" id="custo">R$ 0</div>
+</div>
+</div>
+
+</div>
+
+<!-- RELATÓRIO DETALHADO -->
+<div class="card card-box mt-4 p-3">
+
+<h5>📋 Detalhamento de Pivôs</h5>
+
+<table class="table table-striped mt-3">
+<thead>
+<tr>
+<th>Nome</th>
+<th>Potência</th>
+<th>Setor</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="tabelaRelatorio"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+async function carregarRelatorio() {
+
+    const res = await fetch("/pivos");
+    const data = await res.json();
+
+    const tabela = document.getElementById("tabelaRelatorio");
+
+    let ativos = 0;
+    let consumo = 0;
+
+    tabela.innerHTML = "";
+
+    data.pivos.forEach(p => {
+
+        if (p.ligado) ativos++;
+
+        consumo += p.potencia_kw || 0;
+
+        tabela.innerHTML += `
+        <tr>
+            <td>${p.nome}</td>
+            <td>${p.potencia_kw} kW</td>
+            <td>${p.setor || "-"}</td>
+            <td>${p.ligado ? "🟢 Ativo" : "🔴 Inativo"}</td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("totalPivos").innerText = data.total;
+    document.getElementById("ativos").innerText = ativos;
+    document.getElementById("consumo").innerText = consumo + " kWh";
+    document.getElementById("custo").innerText = "R$ " + (consumo * 0.65).toFixed(2);
+}
+
+carregarRelatorio();
+
+</script>
+
+</body>
+</html>
