@@ -1,0 +1,85 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById('graficoEnergia');
+
+    if (!canvas) {
+        console.warn("Canvas graficoEnergia não encontrado na página");
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+        console.error("Não foi possível obter contexto do canvas");
+        return;
+    }
+
+    try {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [
+                    'Jan','Fev','Mar','Abr',
+                    'Mai','Jun','Jul','Ago',
+                    'Set','Out','Nov','Dez'
+                ],
+                datasets: [{
+                    label: 'Consumo (kWh)',
+                    data: [
+                        1000,1200,1150,1350,
+                        1420,1500,1650,1720,
+                        1680,1540,1400,1300
+                    ],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        console.log("📊 Gráfico renderizado com sucesso");
+
+    } catch (e) {
+        console.error("Erro ao renderizar gráfico:", e);
+    }
+
+});
+
+
+function calcular() {
+
+    let potencia = Number(document.getElementById("equipamento").value);
+    let horas = Number(document.getElementById("horas").value);
+    let tarifa = Number(document.getElementById("tarifa").value);
+
+    if (isNaN(potencia) || isNaN(horas) || isNaN(tarifa)) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+    }
+
+    let consumo = potencia * horas * 30;
+    let custo = consumo * tarifa;
+
+    document.getElementById("resultado").innerText =
+        consumo.toLocaleString("pt-BR") + " kWh/mês";
+
+    document.getElementById("resultadoCusto").innerText =
+        "R$ " + custo.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+}
+
+</script>

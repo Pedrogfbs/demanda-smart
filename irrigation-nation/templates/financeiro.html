@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Financeiro - Demand Smart{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="page-title">
+            <i class="fa-solid fa-money-bill-trend-up"></i>
+            Financeiro Operacional
+        </h2>
+
+        <p class="page-subtitle">
+            Controle financeiro da operação, consumo energético e custos da irrigação.
+        </p>
+    </div>
+
+</div>
+
+<!-- KPIs -->
+
+<div class="row">
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted mb-2">
+                    Consumo Atual
+                </div>
+
+                <h2 id="consumoAtual" class="text-primary fw-bold">
+                    0 kW
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted mb-2">
+                    Custo de Energia
+                </div>
+
+                <h2 id="custoEnergia" class="text-danger fw-bold">
+                    R$ 0,00
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted mb-2">
+                    Manutenção
+                </div>
+
+                <h2 id="custoManutencao" class="text-warning fw-bold">
+                    R$ 0,00
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <div class="text-muted mb-2">
+                    Aquisição de Pivôs
+                </div>
+
+                <h2 id="custoPivos" class="text-danger fw-bold">
+                    R$ 0,00
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TOTAL OPERACIONAL -->
+
+<div class="card mb-4">
+
+    <div class="card-body text-center">
+
+        <small class="text-muted">
+            Custo Operacional Total
+        </small>
+
+        <h1 id="custoTotal" class="fw-bold text-danger mt-2">
+            R$ 0,00
+        </h1>
+
+    </div>
+
+</div>
+
+<!-- RESUMO FINANCEIRO -->
+
+<div class="row">
+
+    <div class="col-lg-4 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Resumo Financeiro
+            </div>
+
+            <div class="card-body">
+
+                <table class="table">
+
+                    <tr>
+                        <td>Receita Projetada</td>
+                        <td class="text-success fw-bold">
+                            R$ 42.500
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Custos Operacionais</td>
+                        <td class="text-danger fw-bold">
+                            <span id="custosTabela">
+                                R$ 0,00
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Resultado Estimado</td>
+                        <td class="text-primary fw-bold">
+                            R$ 31.000
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-8 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <i class="fa-solid fa-chart-line"></i>
+                Evolução dos Custos Mensais
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="graficoFinanceiro"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TABELA DE DESPESAS -->
+
+<div class="card">
+
+    <div class="card-header">
+
+        <i class="fa-solid fa-table"></i>
+        Despesas Operacionais
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Energia Elétrica</td>
+                        <td id="energiaTabela">
+                            R$ 0,00
+                        </td>
+                        <td>
+                            <span class="badge bg-success">
+                                Pago
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Manutenção</td>
+                        <td id="manutencaoTabela">
+                            R$ 0,00
+                        </td>
+                        <td>
+                            <span class="badge bg-warning text-dark">
+                                Em análise
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Aquisição de Equipamentos</td>
+                        <td id="pivosTabela">
+                            R$ 0,00
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">
+                                Planejado
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let graficoFinanceiro = null;
+
+async function carregarFinanceiro() {
+
+    try {
+
+        const response = await fetch("/dashboard");
+        const dados = await response.json();
+
+        const energia = dados.demanda_atual_kw || 205;
+
+        const custoEnergia = energia * 0.75;
+        const custoManutencao = 1850;
+        const custoPivos = 4500;
+
+        const custoTotal =
+            custoEnergia +
+            custoManutencao +
+            custoPivos;
+
+        document.getElementById("consumoAtual").innerText =
+            energia + " kW";
+
+        document.getElementById("custoEnergia").innerText =
+            "R$ " + custoEnergia.toFixed(2);
+
+        document.getElementById("custoManutencao").innerText =
+            "R$ " + custoManutencao.toFixed(2);
+
+        document.getElementById("custoPivos").innerText =
+            "R$ " + custoPivos.toFixed(2);
+
+        document.getElementById("custoTotal").innerText =
+            "R$ " + custoTotal.toFixed(2);
+
+        document.getElementById("energiaTabela").innerText =
+            "R$ " + custoEnergia.toFixed(2);
+
+        document.getElementById("manutencaoTabela").innerText =
+            "R$ " + custoManutencao.toFixed(2);
+
+        document.getElementById("pivosTabela").innerText =
+            "R$ " + custoPivos.toFixed(2);
+
+        document.getElementById("custosTabela").innerText =
+            "R$ " + custoTotal.toFixed(2);
+
+    } catch (erro) {
+
+        console.error("Erro financeiro:", erro);
+
+    }
+
+}
+
+function carregarGrafico() {
+
+    const meses = [
+        "Jan","Fev","Mar","Abr",
+        "Mai","Jun","Jul","Ago",
+        "Set","Out","Nov","Dez"
+    ];
+
+    if(graficoFinanceiro){
+        graficoFinanceiro.destroy();
+    }
+
+    graficoFinanceiro = new Chart(
+        document.getElementById("graficoFinanceiro"),
+        {
+            type: "line",
+
+            data: {
+
+                labels: meses,
+
+                datasets: [
+
+                    {
+                        label: "Energia",
+                        data: [8200,8700,9100,8900,9400,9800,10100,9950,9600,9200,8900,8500],
+                        borderColor: "#2563eb",
+                        tension: 0.4
+                    },
+
+                    {
+                        label: "Manutenção",
+                        data: [900,1200,850,1300,1800,1400,1600,2100,1700,1500,1200,1000],
+                        borderColor: "#f59e0b",
+                        tension: 0.4
+                    },
+
+                    {
+                        label: "Equipamentos",
+                        data: [0,0,4500,0,0,0,0,5200,0,0,0,0],
+                        borderColor: "#dc2626",
+                        tension: 0.4
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+                        position: "bottom"
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+carregarFinanceiro();
+carregarGrafico();
+
+</script>
+
+{% endblock %}

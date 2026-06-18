@@ -1,3 +1,37 @@
+from fastapi import APIRouter, Request
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
+
+# ==================================
+# ROUTER
+# ==================================
+
+router = APIRouter()
+
+# ==================================
+# TEMPLATES (CORRIGIDO DE FORMA SEGURA)
+# ==================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+# ==================================
+# ROTA WEB
+# ==================================
+
+@router.get("/gestao-energia")
+async def gestao_energia(request: Request):
+    return templates.TemplateResponse(
+        "gestao_energia.html",
+        {"request": request}
+    )
+
+# ==================================
+# DADOS DOS PIVÔS
+# ==================================
+
 PIVOS = [
     {
         "id": 1,
@@ -29,7 +63,6 @@ PIVOS = [
     }
 ]
 
-
 # =========================
 # CONSULTAS
 # =========================
@@ -39,39 +72,22 @@ def listar_pivos():
 
 
 def obter_pivo(pivo_id: int):
-    return next(
-        (p for p in PIVOS if p["id"] == pivo_id),
-        None
-    )
-
+    return next((p for p in PIVOS if p["id"] == pivo_id), None)
 
 # =========================
 # CÁLCULOS
 # =========================
 
 def calcular_demanda_atual():
-    return sum(
-        p["potencia_kw"]
-        for p in PIVOS
-        if p["ligado"]
-    )
+    return sum(p["potencia_kw"] for p in PIVOS if p["ligado"])
 
 
 def calcular_demanda_total():
-    return sum(
-        p["potencia_kw"]
-        for p in PIVOS
-    )
+    return sum(p["potencia_kw"] for p in PIVOS)
 
 
-def calcular_potencia_disponivel(
-    demanda_contratada: float
-):
-    return max(
-        0,
-        demanda_contratada - calcular_demanda_atual()
-    )
-
+def calcular_potencia_disponivel(demanda_contratada: float):
+    return max(0, demanda_contratada - calcular_demanda_atual())
 
 # =========================
 # CADASTRO
@@ -79,63 +95,42 @@ def calcular_potencia_disponivel(
 
 def cadastrar_pivo(pivo: dict):
 
-    novo_id = max(
-        [p["id"] for p in PIVOS],
-        default=0
-    ) + 1
+    novo_id = max([p["id"] for p in PIVOS], default=0) + 1
 
     novo = {
         "id": novo_id,
         "nome": pivo.get("nome"),
         "fabricante": pivo.get("fabricante"),
         "modelo": pivo.get("modelo"),
-        "potencia_kw": float(
-            pivo.get("potencia_kw", 0)
-        ),
-        "area_irrigada_ha": float(
-            pivo.get("area_irrigada_ha", 0)
-        ),
-        "comprimento_m": float(
-            pivo.get("comprimento_m", 0)
-        ),
-        "vazao_m3_h": float(
-            pivo.get("vazao_m3_h", 0)
-        ),
-        "tensao_v": float(
-            pivo.get("tensao_v", 380)
-        ),
+        "potencia_kw": float(pivo.get("potencia_kw", 0)),
+        "area_irrigada_ha": float(pivo.get("area_irrigada_ha", 0)),
+        "comprimento_m": float(pivo.get("comprimento_m", 0)),
+        "vazao_m3_h": float(pivo.get("vazao_m3_h", 0)),
+        "tensao_v": float(pivo.get("tensao_v", 380)),
         "cultura": pivo.get("cultura"),
         "setor": pivo.get("setor"),
-        "ligado": bool(
-            pivo.get("ligado", False)
-        )
+        "ligado": bool(pivo.get("ligado", False))
     }
 
     PIVOS.append(novo)
-
     return novo
-
 
 # =========================
 # UPDATE
 # =========================
 
-def atualizar_pivo(
-    pivo_id: int,
-    dados: dict
-):
+def atualizar_pivo(pivo_id: int, dados: dict):
 
     pivo = obter_pivo(pivo_id)
 
     if not pivo:
         return None
 
+    dados = dados.copy()
     dados.pop("id", None)
 
     pivo.update(dados)
-
     return pivo
-
 
 # =========================
 # DELETE
@@ -144,33 +139,25 @@ def atualizar_pivo(
 def excluir_pivo(pivo_id: int):
 
     for i, p in enumerate(PIVOS):
-
         if p["id"] == pivo_id:
             del PIVOS[i]
             return True
 
     return False
 
-
 # =========================
 # LIGA / DESLIGA
 # =========================
 
 def ligar_pivo(pivo_id: int):
-
     p = obter_pivo(pivo_id)
-
     if p:
         p["ligado"] = True
-
     return p
 
 
 def desligar_pivo(pivo_id: int):
-
     p = obter_pivo(pivo_id)
-
     if p:
         p["ligado"] = False
-
     return p

@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Demand Smart
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.kpi-card{
+    transition:.3s;
+}
+
+.kpi-card:hover{
+    transform:translateY(-4px);
+}
+
+.kpi-icon{
+    width:55px;
+    height:55px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.valor{
+    font-size:2rem;
+    font-weight:700;
+}
+
+.lista-pivos{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.lista-pivos li{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.grafico-container{
+    height:380px;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h1 class="page-title mb-1">
+            Dashboard Operacional
+        </h1>
+
+        <p class="page-subtitle">
+            Monitoramento em tempo real da demanda elétrica e dos pivôs.
+        </p>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card kpi-card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <small class="text-muted">
+                            Demanda Atual
+                        </small>
+
+                        <div
+                            id="demandaAtual"
+                            class="valor text-primary">
+
+                            0 kW
+
+                        </div>
+                    </div>
+
+                    <div class="kpi-icon bg-primary bg-opacity-10">
+                        ⚡
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card kpi-card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <small class="text-muted">
+                            Potência Disponível
+                        </small>
+
+                        <div
+                            id="potenciaDisponivel"
+                            class="valor text-success">
+
+                            0 kW
+
+                        </div>
+                    </div>
+
+                    <div class="kpi-icon bg-success bg-opacity-10">
+                        🔋
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card kpi-card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <small class="text-muted">
+                            Total de Pivôs
+                        </small>
+
+                        <div
+                            id="totalPivos"
+                            class="valor">
+
+                            0
+
+                        </div>
+                    </div>
+
+                    <div class="kpi-icon bg-info bg-opacity-10">
+                        💧
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="card kpi-card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <small class="text-muted">
+                            Status Sistema
+                        </small>
+
+                        <div
+                            id="statusSistema"
+                            class="valor text-success">
+
+                            ONLINE
+
+                        </div>
+                    </div>
+
+                    <div class="kpi-icon bg-success bg-opacity-10">
+                        🟢
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-8 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <i class="fa-solid fa-chart-column"></i>
+                Consumo Mensal (kWh)
+            </div>
+
+            <div class="card-body grafico-container">
+
+                <canvas id="graficoConsumo"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4 mb-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <i class="fa-solid fa-circle-play"></i>
+                Pivôs Ligados
+            </div>
+
+            <div class="card-body">
+
+                <ul
+                    id="listaPivos"
+                    class="lista-pivos">
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let graficoConsumo = null;
+
+async function carregarDashboard(){
+
+    try{
+
+        const response =
+            await fetch("/dashboard");
+
+        const dados =
+            await response.json();
+
+        document.getElementById("demandaAtual").innerText =
+            dados.demanda_atual_kw + " kW";
+
+        document.getElementById("potenciaDisponivel").innerText =
+            dados.potencia_disponivel_kw + " kW";
+
+        document.getElementById("totalPivos").innerText =
+            dados.quantidade_pivos;
+
+        const lista =
+            document.getElementById("listaPivos");
+
+        lista.innerHTML = "";
+
+        dados.pivos_ligados.forEach(nome => {
+
+            lista.innerHTML += `
+                <li>
+                    🟢 ${nome}
+                </li>
+            `;
+
+        });
+
+    }catch(error){
+
+        document.getElementById("statusSistema")
+            .innerText = "OFFLINE";
+
+    }
+
+}
+
+async function carregarGrafico(){
+
+    const response =
+        await fetch("/dashboard-anual");
+
+    const dados =
+        await response.json();
+
+    const meses = [
+        "Jan","Fev","Mar","Abr",
+        "Mai","Jun","Jul","Ago",
+        "Set","Out","Nov","Dez"
+    ];
+
+    if(graficoConsumo){
+        graficoConsumo.destroy();
+    }
+
+    graficoConsumo = new Chart(
+        document.getElementById("graficoConsumo"),
+        {
+            type:"bar",
+
+            data:{
+                labels:meses,
+
+                datasets:[{
+                    label:"Consumo kWh",
+                    data:dados.consumo_mensal,
+                    borderRadius:8
+                }]
+            },
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false
+            }
+        }
+    );
+
+}
+
+carregarDashboard();
+carregarGrafico();
+
+setInterval(
+    carregarDashboard,
+    5000
+);
+
+</script>
+
+{% endblock %}

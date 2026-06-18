@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Demand Smart{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h1 class="page-title">
+            <i class="fa-solid fa-chart-column"></i>
+            Relatórios do Sistema
+        </h1>
+
+        <p class="page-subtitle">
+            Indicadores operacionais, energéticos e desempenho dos pivôs.
+        </p>
+    </div>
+
+    <button class="btn btn-primary">
+        <i class="fa-solid fa-file-arrow-down"></i>
+        Exportar Relatório
+    </button>
+
+</div>
+
+<!-- KPIs -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+                    Total de Pivôs
+                </small>
+
+                <h2
+                    id="totalPivos"
+                    class="fw-bold mt-2">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+                    Pivôs Ativos
+                </small>
+
+                <h2
+                    id="ativos"
+                    class="fw-bold text-success mt-2">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+                    Consumo Total
+                </small>
+
+                <h2
+                    id="consumo"
+                    class="fw-bold text-primary mt-2">
+                    0 kWh
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+                    Custo Estimado
+                </small>
+
+                <h2
+                    id="custo"
+                    class="fw-bold text-danger mt-2">
+                    R$ 0,00
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TABELA -->
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <span>
+            <i class="fa-solid fa-table"></i>
+            Detalhamento dos Pivôs
+        </span>
+
+        <input
+            type="text"
+            class="form-control w-auto"
+            placeholder="Pesquisar">
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Pivô</th>
+                        <th>Potência</th>
+                        <th>Setor</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="tabelaRelatorio">
+
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            Carregando dados...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+async function carregarRelatorio() {
+
+    try {
+
+        const resposta = await fetch("/dashboard");
+
+        const dados = await resposta.json();
+
+        document.getElementById("totalPivos").innerText =
+            dados.quantidade_pivos || 0;
+
+        document.getElementById("ativos").innerText =
+            dados.pivos_ligados?.length || 0;
+
+        const consumoEstimado =
+            (dados.demanda_atual_kw || 0) * 30;
+
+        document.getElementById("consumo").innerText =
+            consumoEstimado.toLocaleString("pt-BR") + " kWh";
+
+        document.getElementById("custo").innerText =
+            "R$ " +
+            (consumoEstimado * 0.65)
+            .toLocaleString("pt-BR", {
+                minimumFractionDigits: 2
+            });
+
+        const tabela =
+            document.getElementById("tabelaRelatorio");
+
+        tabela.innerHTML = "";
+
+        if (dados.pivos_ligados &&
+            dados.pivos_ligados.length > 0) {
+
+            dados.pivos_ligados.forEach(nome => {
+
+                tabela.innerHTML += `
+                <tr>
+                    <td>${nome}</td>
+                    <td>45 kW</td>
+                    <td>Setor A</td>
+                    <td>
+                        <span class="badge bg-success">
+                            Ativo
+                        </span>
+                    </td>
+                </tr>
+                `;
+
+            });
+
+        } else {
+
+            tabela.innerHTML = `
+            <tr>
+                <td colspan="4"
+                    class="text-center text-muted">
+                    Nenhum pivô ativo.
+                </td>
+            </tr>
+            `;
+
+        }
+
+    } catch (erro) {
+
+        console.error(erro);
+
+    }
+
+}
+
+carregarRelatorio();
+
+</script>
+
+{% endblock %}

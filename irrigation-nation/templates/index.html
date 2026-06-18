@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Demand Smart{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">⚡ Dashboard de Energia</h2>
+            <small class="text-muted">Monitoramento inteligente de consumo e equipamentos</small>
+        </div>
+
+        <div>
+            <button class="btn btn-primary btn-sm">🔄 Atualizar</button>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <small class="text-muted">Consumo Total</small>
+                <h4 class="fw-bold">1.240 kWh</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <small class="text-muted">Custo Estimado</small>
+                <h4 class="fw-bold">R$ 3.890</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <small class="text-muted">Eficiência</small>
+                <h4 class="fw-bold">87%</h4>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <small class="text-muted">Equipamentos</small>
+                <h4 class="fw-bold">18</h4>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRÁFICO -->
+    <div class="card p-4">
+        <h6 class="fw-bold mb-3">📈 Consumo Mensal</h6>
+        <canvas id="graficoConsumo"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const ctx = document.getElementById('graficoConsumo');
+
+    if (!ctx) return;
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
+            datasets: [{
+                label: 'Consumo (kWh)',
+                data: [120, 190, 150, 220, 180, 240],
+                borderWidth: 3,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+});
+</script>
+
+{% endblock %}
